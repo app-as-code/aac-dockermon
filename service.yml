@@ -1,0 +1,67 @@
+service:
+  name: aac-dockermon
+  image_repo: philhawthorne/ha-dockermon
+  image_tag: v0.0.13
+  description: A service to monitor Docker container status for Home Assistant.
+  icon: https://img.icons8.com/?size=100&id=GOHWqwnSE8Sv&format=png&color=000000
+  category: Container - Dockermon
+  stage: prod
+  hostname: '{{ service.name }}'
+ports:
+- name: web
+  port: 8126
+  protocol: TCP
+  external_port: 8122
+config:
+  domain_name: example.com
+  generate_hostname: false
+  integrations:
+    homepage:
+      enabled: true
+      href: '#'
+    autodns:
+      enabled: true
+    traefik:
+      enabled: false
+  schema_version: 2
+volumes:
+  config:
+    description: Configuration files for Dockermon
+  docker_sock:
+    type: bind
+    source: /var/run/docker.sock
+deployment_strategy:
+  main:
+    enabled: true
+    target_stage: prod
+  dev:
+    enabled: true
+    target_stage: dev
+  test:
+    enabled: false
+    target_stage: test
+  ansible-dev:
+    enabled: true
+    target_stage: dev
+  iac-dev:
+    enabled: true
+    target_stage: dev
+  template-dev:
+    enabled: true
+    target_stage: dev
+deployments:
+  docker_compose:
+    restart_policy: always
+    host_base_path: /export/docker
+    volumes:
+    - docker_sock:/var/run/docker.sock:ro
+    - config:/config
+    environment:
+      PUID: '{{ vars.PUID }}'
+      TZ: '{{ vars.TZ }}'
+      PGID: '{{ vars.PGID }}'
+vars:
+  PUID: '1000'
+  TZ: Europe/Berlin
+  PGID: '1000'
+secrets: {}

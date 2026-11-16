@@ -1,0 +1,54 @@
+services:
+  # --- Main Application Service ---
+  aac-dockermon:
+    image: "philhawthorne/ha-dockermon:v0.0.13"
+    container_name: "aac-dockermon"
+    hostname: "aac-dockermon"
+    restart: "always"
+
+
+    environment:
+      PUID: "1000"
+      TZ: "Europe/Berlin"
+      PGID: "1000"
+
+    ports:
+      - "8122:8126/tcp"
+
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/export/docker/aac-dockermon/config:/config"
+
+    networks:
+      - exposed
+      - interconnect
+      - stack_internal
+
+    labels:
+      auto-dns.createWildcard.aac-dockermon: "false"
+      auto-dns.customDNS.aac-dockermon: "true"
+      auto-dns.customDOMAIN.aac-dockermon: "example.com"
+      auto-dns.customHost.aac-dockermon: "aac-dockermon"
+      homepage.group: "Container - Dockermon"
+      homepage.name: "Dockermon"
+      homepage.href: "#"
+      homepage.icon: "https://img.icons8.com/?size=100&id=GOHWqwnSE8Sv&format=png&color=000000"
+      homepage.description: "A service to monitor Docker container status for Home Assistant."
+
+
+
+
+networks:
+  secured:
+    name: "services-secured"
+    external: true
+  exposed:
+    name: "services-exposed"
+    external: true
+  interconnect:
+    name: "docker-default"
+    external: true
+  stack_internal:
+    name: "aac-dockermon_stack_internal"
+    driver: "bridge"
+
